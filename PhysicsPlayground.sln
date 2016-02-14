@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicsPlayground", "PhysicsPlayground\PhysicsPlayground.csproj", "{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Debug|x64.ActiveCfg = Debug|x64
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Debug|x64.Build.0 = Debug|x64
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Release|x64.ActiveCfg = Release|x64
+		{E6DBEE21-76F8-4B1D-9F80-6B6E10CB0F1D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
