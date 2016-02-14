@@ -30,10 +30,12 @@ namespace PhysicsPlayground
 
 		public override List<Vector2f> GetProjectionAxes()
 		{
-			List<Vector2f> ret = new List<Vector2f>(2);
+			List<Vector2f> ret = new List<Vector2f>(4);
 
 			ret.Add(new Vector2f(circle.Radius, 0).Unit());
 			ret.Add(new Vector2f(0, circle.Radius).Unit());
+			ret.Add(new Vector2f(circle.Radius, circle.Radius).Unit());
+			ret.Add(new Vector2f(circle.Radius, -circle.Radius).Unit());
 
 			return ret;
 		}
