@@ -74,9 +74,11 @@
     <Compile Include="Circle.cs" />
     <Compile Include="Collision.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="Shape.cs" />
+    <Compile Include="Triangle.cs" />
     <Compile Include="VectorExt.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

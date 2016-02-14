@@ -22,6 +22,7 @@ namespace PhysicsPlayground
 
 			Vector2f pos = Position;
 
+			// return the ends of a diameter parallel to the given axis
 			edges[0] = pos + axis * -circle.Radius;
 			edges[1] = pos + axis * circle.Radius;
 

@@ -9,7 +9,7 @@ namespace PhysicsPlayground
 		public readonly bool result;
 		public readonly Vector2f position;
 
-		public Collision(Shape left, Shape right)
+		public Collision(Shape left, Shape right, ref Vector2f projection)
 		{
 			List<Vector2f> axes = left.GetProjectionAxes();
 
@@ -35,19 +35,8 @@ namespace PhysicsPlayground
 
 			// if we reach this point, the shapes collided
 			result = true;
-			Vector2f magnitude = smallest.axis * smallest.amount / 2f;
-			position = left.Position + magnitude;
-
-			// move shapes out of each other
-			left.Position += magnitude;
-			right.Position -= magnitude;
-
-			// take a little "heat" energy
-			magnitude *= Game.COLLISION_RATIO;
-
-			// apply a force along collision axis to each shape
-			left.ApplyForce(magnitude);
-			right.ApplyForce(-magnitude);
+			projection = smallest.axis * smallest.amount / 2f;
+			position = left.Position + projection;
 		}
 	}
 }

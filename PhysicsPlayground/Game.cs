@@ -7,11 +7,13 @@ namespace PhysicsPlayground
 {
 	internal class Game
 	{
-		public static readonly Time dt = Time.FromSeconds(1f / 60f);
-		private const float GRAVITY = 100;
+		public const float GRAVITY = 100f;
 		public const float COLLISION_RATIO = 0.75f;
+		public const float SHAPE_SIZE = 20f;
+		public static readonly Time dt = Time.FromSeconds(1f / 120f);
 
 		private static List<Shape> shapes;
+		private static Shape selectedShape = null;
 
 		private static RenderWindow window;
 		private static Time lag = Time.FromSeconds(0);
@@ -72,7 +74,23 @@ namespace PhysicsPlayground
 				foreach(Shape o in shapes)
 				{
 					if(o != s)
-						new Collision(s, o);
+					{
+						Vector2f projection = new Vector2f();
+
+						if(new Collision(s, o, ref projection).result)
+						{
+							// move shapes out of each other
+							s.Position -= projection;
+							o.Position += projection;
+
+							// take a little "heat" energy
+							projection *= COLLISION_RATIO;
+
+							// apply a force along collision axis to each shape
+							s.ApplyForce(-projection * o.mass);
+							o.ApplyForce(projection * s.mass);
+						}
+					}
 				}
 
 				// update velocity and position
@@ -83,6 +101,13 @@ namespace PhysicsPlayground
 
 				// zero out all acceleration (relative to gravity)
 				s.Acceleration = new Vector2f(0, GRAVITY);
+			}
+
+			if(selectedShape != null)
+			{
+				// selected shape should ignore gravity and any movement
+				selectedShape.Acceleration = new Vector2f(0, 0);
+				selectedShape.Velocity = new Vector2f(0, 0);
 			}
 		}
 
@@ -127,23 +152,81 @@ namespace PhysicsPlayground
 			{
 				switch(ev.Code)
 				{
+					// add shapes
 					case Keyboard.Key.Q:
-						Shape rect = new Rectangle(10, 10);
+						Shape rect = new Rectangle(SHAPE_SIZE, SHAPE_SIZE);
 						rect.Position = (Vector2f)Mouse.GetPosition(window);
 						shapes.Add(rect);
 						break;
 
 					case Keyboard.Key.W:
-						Shape cir = new Circle(10);
+						Shape cir = new Circle(SHAPE_SIZE / 2f);
 						cir.Position = (Vector2f)Mouse.GetPosition(window);
 						shapes.Add(cir);
 						break;
 
 					case Keyboard.Key.E:
+						Shape tri = new Triangle(SHAPE_SIZE * 2, SHAPE_SIZE);
+						tri.Position = (Vector2f)Mouse.GetPosition(window);
+						shapes.Add(tri);
+						break;
+					
+					// exit
+					case Keyboard.Key.Escape:
+						window.Close();
 						break;
 
 					default:
 						break;
+				}
+			};
+
+			window.MouseButtonPressed += (s, ev) =>
+			{
+				switch(ev.Button)
+				{
+					case Mouse.Button.Left:
+						// find which shape the mouse was clicked on (if any)
+						Point pt = new Point(new Vector2f(ev.X, ev.Y));
+
+						selectedShape = null;
+
+						foreach(Shape shp in shapes)
+						{
+							Vector2f projection = new Vector2f();
+
+							if(new Collision(shp, pt, ref projection).result)
+							{
+								selectedShape = shp;
+								break;
+							}
+						}
+
+						break;
+
+					default:
+						break;
+				}
+			};
+
+			window.MouseButtonReleased += (s, ev) =>
+			{
+				switch(ev.Button)
+				{
+					case Mouse.Button.Left:
+						selectedShape = null;
+						break;
+
+					default:
+						break;
+				}
+			};
+
+			window.MouseMoved += (s, ev) =>
+			{
+				if(selectedShape != null)
+				{
+					selectedShape.Position = new Vector2f(ev.X, ev.Y);
 				}
 			};
 		}

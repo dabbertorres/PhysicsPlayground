@@ -14,6 +14,12 @@ namespace PhysicsPlayground
 			set;
 		}
 
+		public Vector2f AngularVelocity
+		{
+			get;
+			set;
+		}
+
 		public Vector2f Acceleration
 		{
 			get;
@@ -30,8 +36,8 @@ namespace PhysicsPlayground
 			Acceleration += force / mass;
 		}
 
-		public abstract List<Vector2f> GetProjectionAxes();
 		public abstract Projection GetProjection(Vector2f axis);
+		public abstract List<Vector2f> GetProjectionAxes();
 
 		public abstract void Draw(RenderTarget target, RenderStates states);
 	}
