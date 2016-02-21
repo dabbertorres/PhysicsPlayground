@@ -34,7 +34,7 @@ namespace PhysicsPlayground
 
 			var posAndOrig = Position - Origin;
 
-			// we want the rotation included, but do not want the position and origin added in
+			// we want the rotation included, but do not want the position and origin included
 			ret.Add(Transform.TransformPoint(new Vector2f(rect.Size.X, 0).Unit()) - posAndOrig);
 			ret.Add(Transform.TransformPoint(new Vector2f(0, rect.Size.Y).Unit()) - posAndOrig);
 

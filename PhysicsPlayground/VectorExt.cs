@@ -10,6 +10,12 @@ namespace PhysicsPlayground
 			return left.X * right.X + left.Y * right.Y;
 		}
 
+		// returns a scalar, the sign of which can be used to determine rotation direction
+		public static float Cross(this Vector2f left, Vector2f right)
+		{
+			return left.X * right.Y - left.Y * right.X;
+		}
+
 		public static float Length(this Vector2f vec)
 		{
 			return (float)Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y);
@@ -24,6 +30,12 @@ namespace PhysicsPlayground
 		public static int Dot(this Vector2i left, Vector2i right)
 		{
 			return left.X * right.X + left.Y * right.Y;
+		}
+
+		// returns a scalar, the sign of which can be used to determine rotation direction
+		public static int Cross(this Vector2i left, Vector2i right)
+		{
+			return left.X * right.Y - left.Y * right.X;
 		}
 
 		public static float Length(this Vector2i vec)
