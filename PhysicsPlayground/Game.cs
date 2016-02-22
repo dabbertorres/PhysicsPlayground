@@ -2,15 +2,18 @@
 using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
+using System;
 
 namespace PhysicsPlayground
 {
 	internal class Game
 	{
+		public static readonly Vector2u WINDOW_SIZE = new Vector2u(800, 600);
+		
 		public const float COLLISION_RATIO = 0.75f;
 		public const float FRICTION_RATIO = 0.99f;
 		public const float SHAPE_SIZE = 20f;
-		public static readonly Vector2f GRAVITY = new Vector2f(0, 100f);
+		public static readonly Vector2f GRAVITY = new Vector2f(0, 100);
 		public static readonly Time dt = Time.FromSeconds(1f / 120f);
 
 		private static List<Shape> shapes;
@@ -25,7 +28,7 @@ namespace PhysicsPlayground
 		{
 			shapes = new List<Shape>();
 
-			window = new RenderWindow(new VideoMode(800, 600), "Physics Playground", Styles.Titlebar | Styles.Close);
+			window = new RenderWindow(new VideoMode(WINDOW_SIZE.X, WINDOW_SIZE.Y), "Physics Playground", Styles.Titlebar | Styles.Close);
 			window.SetVerticalSyncEnabled(true);
 			window.SetKeyRepeatEnabled(false);
 			SetupEvents();
@@ -69,52 +72,37 @@ namespace PhysicsPlayground
 
 		private static void Update()
 		{
-			foreach(Shape s in shapes)
+			foreach(Shape shape in shapes)
 			{
 				// run collision handling
-				foreach(Shape o in shapes)
+				foreach(Shape other in shapes)
 				{
-					if(o != s)
+					if(shape != other)
 					{
-						Vector2f projection = new Vector2f();
-
-						var collision = new Collision(s, o, ref projection);
+						var collision = new Collision(shape, other);
 						if(collision.result)
 						{
 							// get vectors from each shape's center to the collision point
-							var sPos = collision.position - s.Position;
-							var oPos = collision.position - o.Position;
+							var sPos = collision.position - shape.Position;
+							var oPos = collision.position - other.Position;
 
 							// move shapes out of each other
-							s.Position -= projection;
-							o.Position += projection;
+							shape.Position -= collision.projection;
+							other.Position += collision.projection;
 
 							// take a little energy
-							projection *= COLLISION_RATIO;
+//							collision.projection *= COLLISION_RATIO;
 
-							var finalForce = projection * (o.mass + s.mass);
+							var finalForce = collision.projection * (other.mass + shape.mass);
 
 							// apply a force along collision axis to each shape at the center of the collision
-							s.ApplyForce(-finalForce, sPos);
-							o.ApplyForce(finalForce, oPos);
+							shape.ApplyForce(-finalForce, sPos);
+							other.ApplyForce(finalForce, oPos);
 						}
 					}
 				}
 
-				// update velocities and position
-				float dts = dt.AsSeconds();
-
-				s.Velocity += s.Acceleration * dts;
-				s.Position += s.Velocity * dts;
-
-				s.AngularVelocity += s.AngularAcceleration * dts;
-				s.Rotation += s.AngularVelocity * dts;
-
-				// zero out all acceleration (relative to gravity)
-				s.Acceleration = GRAVITY;
-				s.AngularAcceleration = 0;
-
-				BoundToWindow(s);
+				UpdateShape(shape);
 			}
 
 			if(selectedShape != null)
@@ -122,6 +110,24 @@ namespace PhysicsPlayground
 				// selected shape should ignore gravity
 				selectedShape.Acceleration -= GRAVITY;
 			}
+		}
+
+		private static void UpdateShape(Shape s)
+		{
+			BoundToWindow(s);
+
+			// update velocities and position
+			float dts = dt.AsSeconds();
+
+			s.Velocity += s.Acceleration * dts;
+			s.Position += s.Velocity * dts;
+
+			s.AngularVelocity += s.AngularAcceleration * dts;
+			s.Rotation += s.AngularVelocity * dts;
+
+			// zero out all acceleration (relative to gravity)
+			s.Acceleration = GRAVITY;
+			s.AngularAcceleration = 0;
 		}
 
 		private static void BoundToWindow(Shape s)
@@ -142,7 +148,7 @@ namespace PhysicsPlayground
 				newPos.Y = window.Size.Y;
 
 				// special case for the "ground", so objects don't sink into it
-				s.ApplyForce(-GRAVITY * s.mass);
+				s.Acceleration -= GRAVITY;
 			}
 
 			// if position changed, then a window boundary was hit
@@ -211,9 +217,7 @@ namespace PhysicsPlayground
 
 						foreach(Shape shp in shapes)
 						{
-							Vector2f projection = new Vector2f();
-
-							if(new Collision(shp, pt, ref projection).result)
+							if(new Collision(shp, pt).result)
 							{
 								selectedShape = shp;
 								break;

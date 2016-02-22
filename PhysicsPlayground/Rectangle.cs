@@ -18,27 +18,35 @@ namespace PhysicsPlayground
 
 		public override Projection GetProjection(Vector2f axis)
 		{
-			Vector2f[] corners = new Vector2f[4];
-			
-			corners[0] = Transform.TransformPoint(new Vector2f(0, 0));              // top-left
-			corners[1] = Transform.TransformPoint(new Vector2f(rect.Size.X, 0));	// top-right
-			corners[2] = Transform.TransformPoint(rect.Size);                       // bot-right
-			corners[3] = Transform.TransformPoint(new Vector2f(0, rect.Size.Y));	// bot-left
+			List<Vector2f> vertices = new List<Vector2f>(4);
 
-			return new Projection(axis, corners);
+			vertices.Add(Transform.TransformPoint(0, 0));               // top-left
+			vertices.Add(Transform.TransformPoint(rect.Size.X, 0));     // top-right
+			vertices.Add(Transform.TransformPoint(rect.Size));          // bot-right
+			vertices.Add(Transform.TransformPoint(0, rect.Size.Y));     // bot-left
+
+			return new Projection(axis, vertices);
 		}
 
 		public override List<Vector2f> GetProjectionAxes()
 		{
 			List<Vector2f> ret = new List<Vector2f>(2);
 
-			var posAndOrig = Position - Origin;
+			// we don't want the position and origin affecting the normalized axis
+			var posAndOrig = Position + Origin;
 
-			// we want the rotation included, but do not want the position and origin included
-			ret.Add(Transform.TransformPoint(new Vector2f(rect.Size.X, 0).Unit()) - posAndOrig);
-			ret.Add(Transform.TransformPoint(new Vector2f(0, rect.Size.Y).Unit()) - posAndOrig);
+			var axis0 = Transform.TransformPoint(rect.Size.X, 0) - posAndOrig;
+			var axis1 = Transform.TransformPoint(0, rect.Size.Y) - posAndOrig;
+
+			ret.Add(axis0.Normalized());
+			ret.Add(axis1.Normalized());
 
 			return ret;
+		}
+
+		public override float GetRadiusOn(Vector2f axis)
+		{
+			return new Vector2f(axis.X * rect.Size.X, axis.Y * rect.Size.Y).Magnitude();
 		}
 
 		public override void Draw(RenderTarget target, RenderStates states)

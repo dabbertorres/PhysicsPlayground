@@ -18,27 +18,33 @@ namespace PhysicsPlayground
 
 		public override Projection GetProjection(Vector2f axis)
 		{
-			Vector2f[] edges = new Vector2f[2];
+			List<Vector2f> vertices = new List<Vector2f>(2);
 
 			Vector2f pos = Position;
 
 			// return the ends of a diameter parallel to the given axis
-			edges[0] = pos + axis * -circle.Radius;
-			edges[1] = pos + axis * circle.Radius;
+			vertices.Add(pos + axis * -circle.Radius);
+			vertices.Add(pos + axis * circle.Radius);
 
-			return new Projection(axis, edges);
+			return new Projection(axis, vertices);
 		}
 
 		public override List<Vector2f> GetProjectionAxes()
 		{
 			List<Vector2f> ret = new List<Vector2f>(4);
 
-			ret.Add(new Vector2f(circle.Radius, 0).Unit());
-			ret.Add(new Vector2f(0, circle.Radius).Unit());
-			ret.Add(new Vector2f(circle.Radius, circle.Radius).Unit());
-			ret.Add(new Vector2f(circle.Radius, -circle.Radius).Unit());
+			// axes to test are at angles (in order): 0, -90, -45, 45
+			ret.Add(new Vector2f(circle.Radius, 0).Normalized());
+			ret.Add(new Vector2f(0, circle.Radius).Normalized());
+			ret.Add(new Vector2f(circle.Radius, circle.Radius).Normalized());
+			ret.Add(new Vector2f(circle.Radius, -circle.Radius).Normalized());
 
 			return ret;
+		}
+
+		public override float GetRadiusOn(Vector2f axis)
+		{
+			return circle.Radius;
 		}
 
 		public override void Draw(RenderTarget target, RenderStates states)

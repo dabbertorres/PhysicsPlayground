@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SFML.Graphics;
 using SFML.System;
 
@@ -10,12 +9,12 @@ namespace PhysicsPlayground
 		private ConvexShape triangle;
 		private float width;
 		private float height;
-		
+
 		public Triangle(float width, float height) : base(0.5f * width * height)
 		{
 			float halfWidth = width / 2f;
 			float halfHeight = height / 2f;
-			
+
 			triangle = new ConvexShape(3);
 			triangle.SetPoint(0, new Vector2f(halfWidth, 0));
 			triangle.SetPoint(1, new Vector2f(width, height));
@@ -30,27 +29,36 @@ namespace PhysicsPlayground
 
 		public override Projection GetProjection(Vector2f axis)
 		{
-			Vector2f[] corners = new Vector2f[3];
-			
-			corners[0] = Transform.TransformPoint(new Vector2f(width / 2f, 0));		// top
-			corners[1] = Transform.TransformPoint(new Vector2f(width, height));		// right
-			corners[2] = Transform.TransformPoint(new Vector2f(0, height));			// left
+			List<Vector2f> vertices = new List<Vector2f>(3);
 
-			return new Projection(axis, corners);
+			vertices.Add(Transform.TransformPoint(width / 2f, 0));  // top
+			vertices.Add(Transform.TransformPoint(width, height));  // right
+			vertices.Add(Transform.TransformPoint(0, height));      // left
+
+			return new Projection(axis, vertices);
 		}
 
 		public override List<Vector2f> GetProjectionAxes()
 		{
 			List<Vector2f> ret = new List<Vector2f>(3);
 
-			var posAndOrig = Position - Origin;
+			// we don't want the position and origin affecting the normalized axis
+			var posAndOrig = Position + Origin;
 
-			// we want the rotation included, but do not want the position and origin included
-			ret.Add(Transform.TransformPoint((triangle.GetPoint(1) - triangle.GetPoint(0)).Unit()) - posAndOrig);
-			ret.Add(Transform.TransformPoint((triangle.GetPoint(2) - triangle.GetPoint(1)).Unit()) - posAndOrig);
-			ret.Add(Transform.TransformPoint((triangle.GetPoint(0) - triangle.GetPoint(2)).Unit()) - posAndOrig);
+			var pt0 = Transform.TransformPoint(triangle.GetPoint(0)) - posAndOrig;
+			var pt1 = Transform.TransformPoint(triangle.GetPoint(1)) - posAndOrig;
+			var pt2 = Transform.TransformPoint(triangle.GetPoint(2)) - posAndOrig;
+
+			ret.Add((pt1 - pt0).Normalized());
+			ret.Add((pt2 - pt1).Normalized());
+			ret.Add((pt0 - pt2).Normalized());
 
 			return ret;
+		}
+
+		public override float GetRadiusOn(Vector2f axis)
+		{
+			return new Vector2f(axis.X * width, axis.Y * height).Magnitude() / 2f;
 		}
 
 		public override void Draw(RenderTarget target, RenderStates states)
