@@ -29,13 +29,7 @@ namespace PhysicsPlayground
 
 		public override Projection GetProjection(Vector2f axis)
 		{
-			List<Vector2f> vertices = new List<Vector2f>(3);
-
-			vertices.Add(Transform.TransformPoint(width / 2f, 0));  // top
-			vertices.Add(Transform.TransformPoint(width, height));  // right
-			vertices.Add(Transform.TransformPoint(0, height));      // left
-
-			return new Projection(axis, vertices);
+			return new Projection(axis, GetGlobalPoints());
 		}
 
 		public override List<Vector2f> GetProjectionAxes()
@@ -65,6 +59,17 @@ namespace PhysicsPlayground
 		{
 			states.Transform = Transform;
 			target.Draw(triangle, states);
+		}
+
+		protected override List<Vector2f> GetGlobalPoints()
+		{
+			List<Vector2f> vertices = new List<Vector2f>(3);
+
+			vertices.Add(Transform.TransformPoint(triangle.GetPoint(0)));   // top
+			vertices.Add(Transform.TransformPoint(triangle.GetPoint(1)));	// right
+			vertices.Add(Transform.TransformPoint(triangle.GetPoint(2)));	// left
+
+			return vertices;
 		}
 	}
 }

@@ -21,9 +21,18 @@ namespace PhysicsPlayground
 			return (float)Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y);
 		}
 
+		public static float MagnitudeSquared(this Vector2f vec)
+		{
+			return vec.X * vec.X + vec.Y * vec.Y;
+		}
+
 		public static Vector2f Unit(this Vector2f vec)
 		{
 			float len = vec.Magnitude();
+
+			if(len == 0)
+				return new Vector2f(0, 0);
+
 			return new Vector2f(vec.X / len, vec.Y / len);
 		}
 
@@ -56,6 +65,11 @@ namespace PhysicsPlayground
 			return (float)Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y);
 		}
 
+		public static int MagnitudeSquared(this Vector2i vec)
+		{
+			return vec.X * vec.X + vec.Y * vec.Y;
+		}
+
 		public static Vector2i Unit(this Vector2i vec)
 		{
 			int len = (int)vec.Magnitude();
@@ -84,6 +98,11 @@ namespace PhysicsPlayground
 		public static float Magnitude(this Vector2u vec)
 		{
 			return (float)Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y);
+		}
+
+		public static uint MagnitudeSquared(this Vector2u vec)
+		{
+			return vec.X * vec.X + vec.Y * vec.Y;
 		}
 
 		public static Vector2u Unit(this Vector2u vec)

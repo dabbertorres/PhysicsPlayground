@@ -90,79 +90,80 @@ namespace PhysicsPlayground
 							shape.Position -= collision.projection;
 							other.Position += collision.projection;
 
-							// take a little energy
-//							collision.projection *= COLLISION_RATIO;
-
-							var finalForce = collision.projection * (other.mass + shape.mass);
+							var finalForce = collision.projection * (other.mass + shape.mass) * COLLISION_RATIO;
 
 							// apply a force along collision axis to each shape at the center of the collision
-							shape.ApplyForce(-finalForce, sPos);
-							other.ApplyForce(finalForce, oPos);
+							shape.ApplyTorque(-finalForce, sPos);
+							other.ApplyTorque(finalForce, oPos);
 						}
 					}
 				}
 
-				UpdateShape(shape);
+				shape.Acceleration = GRAVITY;
+				BoundToWindow(shape);
+				shape.Update(dt.AsSeconds());
 			}
 
 			if(selectedShape != null)
 			{
 				// selected shape should ignore gravity
-				selectedShape.Acceleration -= GRAVITY;
+				selectedShape.Acceleration = new Vector2f(0, 0);
 			}
 		}
 
-		private static void UpdateShape(Shape s)
+		private static void BoundToWindow(Shape shape)
 		{
-			BoundToWindow(s);
-
-			// update velocities and position
-			float dts = dt.AsSeconds();
-
-			s.Velocity += s.Acceleration * dts;
-			s.Position += s.Velocity * dts;
-
-			s.AngularVelocity += s.AngularAcceleration * dts;
-			s.Rotation += s.AngularVelocity * dts;
-
-			// zero out all acceleration (relative to gravity)
-			s.Acceleration = GRAVITY;
-			s.AngularAcceleration = 0;
-		}
-
-		private static void BoundToWindow(Shape s)
-		{
-			Vector2f pos = s.Position;
+			Vector2f pos = shape.Position;
 			Vector2f newPos = pos;
 
+			Vector2f torquePoint = new Vector2f();
+
+			// horizontal bounds
+			if(shape.HasVertexOver(0, true, true, ref torquePoint) || shape.HasVertexOver(window.Size.X, true, false, ref torquePoint))
+			{
+				// apply a force to invert the shape's velocity
+				var pointsVelocity = shape.Velocity.X + shape.AngularVelocity * torquePoint.Magnitude();
+				Vector2f force = new Vector2f(shape.mass * -2 * pointsVelocity, 0);
+				shape.ApplyTorque(force, torquePoint);
+			}
+
+			// vertical bounds
+			if(shape.HasVertexOver(0, false, true, ref torquePoint) || shape.HasVertexOver(window.Size.Y, false, false, ref torquePoint))
+			{
+				// apply a force to invert the shape's velocity
+				var pointsVelocity = shape.Velocity.Y + shape.AngularVelocity * torquePoint.Magnitude();
+				Vector2f force = new Vector2f(0, shape.mass * -2 * pointsVelocity);
+				shape.ApplyTorque(force, torquePoint);
+			}
+
 			// bound position to window
+			Vector2f oppositeVelocity = new Vector2f();
+
 			if(pos.X < 0)
+			{
 				newPos.X = 0;
+				oppositeVelocity.X = -2 * shape.Velocity.X;
+			}
 			else if(pos.X > window.Size.X)
+			{
 				newPos.X = window.Size.X;
+				oppositeVelocity.X = -2 * shape.Velocity.X;
+			}
 
 			if(pos.Y < 0)
+			{
 				newPos.Y = 0;
+				oppositeVelocity.Y = -2 * shape.Velocity.Y;
+			}
 			else if(pos.Y > window.Size.Y)
 			{
 				newPos.Y = window.Size.Y;
-
-				// special case for the "ground", so objects don't sink into it
-				s.Acceleration -= GRAVITY;
+				oppositeVelocity.Y = -2 * shape.Velocity.Y;
 			}
 
-			// if position changed, then a window boundary was hit
-			// invert velocity direction and take some "heat" energy
-			Vector2f vel = s.Velocity;
-			if(newPos.X != pos.X)
-				vel.X *= -COLLISION_RATIO;
-
-			if(newPos.Y != pos.Y)
-				vel.Y *= -COLLISION_RATIO;
-
 			// apply
-			s.Position = newPos;
-			s.Velocity = vel;
+			shape.Position = newPos;
+			shape.ApplyForce(shape.mass * oppositeVelocity / dt.AsSeconds() * COLLISION_RATIO);
 		}
 
 		private static void SetupEvents()

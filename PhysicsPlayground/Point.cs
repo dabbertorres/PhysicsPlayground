@@ -36,5 +36,10 @@ namespace PhysicsPlayground
 		{
 			// do nothing
 		}
+
+		protected override List<Vector2f> GetGlobalPoints()
+		{
+			return new List<Vector2f> { point };
+		}
 	}
 }

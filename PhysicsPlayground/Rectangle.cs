@@ -18,14 +18,7 @@ namespace PhysicsPlayground
 
 		public override Projection GetProjection(Vector2f axis)
 		{
-			List<Vector2f> vertices = new List<Vector2f>(4);
-
-			vertices.Add(Transform.TransformPoint(0, 0));               // top-left
-			vertices.Add(Transform.TransformPoint(rect.Size.X, 0));     // top-right
-			vertices.Add(Transform.TransformPoint(rect.Size));          // bot-right
-			vertices.Add(Transform.TransformPoint(0, rect.Size.Y));     // bot-left
-
-			return new Projection(axis, vertices);
+			return new Projection(axis, GetGlobalPoints());
 		}
 
 		public override List<Vector2f> GetProjectionAxes()
@@ -53,6 +46,18 @@ namespace PhysicsPlayground
 		{
 			states.Transform = Transform;
 			target.Draw(rect, states);
+		}
+
+		protected override List<Vector2f> GetGlobalPoints()
+		{
+			List<Vector2f> vertices = new List<Vector2f>(4);
+
+			vertices.Add(Transform.TransformPoint(rect.GetPoint(0)));	// top-left
+			vertices.Add(Transform.TransformPoint(rect.GetPoint(1)));	// top-right
+			vertices.Add(Transform.TransformPoint(rect.GetPoint(2)));	// bot-right
+			vertices.Add(Transform.TransformPoint(rect.GetPoint(3)));	// bot-left
+
+			return vertices;
 		}
 	}
 }

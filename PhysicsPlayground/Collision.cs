@@ -18,7 +18,7 @@ namespace PhysicsPlayground
 			// get rid of duplicate axes
 			axes = axes.Union(right.GetProjectionAxes()).ToList();
 
-			Vector2f smallest = new Vector2f();
+			Vector2f smallest = new Vector2f(0, 0);
 
 			foreach(Vector2f axis in axes)
 			{
@@ -31,7 +31,8 @@ namespace PhysicsPlayground
 					return;
 				}
 
-				if(IsSmaller(overlap, smallest))
+				// smallest is defaulted to having a magnitude of 0
+				if(IsSmaller(overlap, smallest) || smallest.MagnitudeSquared() == 0)
 					smallest = overlap;
 			}
 
@@ -43,13 +44,7 @@ namespace PhysicsPlayground
 
 		private static bool IsSmaller(Vector2f left, Vector2f right)
 		{
-			var leftMag = left.Magnitude();
-			var rightMag = right.Magnitude();
-
-			if(leftMag == 0 || rightMag == 0)
-				return true;
-
-			return Math.Abs(leftMag) < Math.Abs(rightMag);
+			return Math.Abs(left.Magnitude()) < Math.Abs(right.Magnitude());
 		}
 	}
 }

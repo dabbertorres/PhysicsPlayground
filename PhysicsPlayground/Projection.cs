@@ -28,10 +28,15 @@ namespace PhysicsPlayground
 			}
 		}
 
+		public bool IsInvalid()
+		{
+			return float.IsNaN(axis.X) || float.IsNaN(axis.Y);
+		}
+
 		public static Vector2f operator -(Projection left, Projection right)
 		{
 			// just return 0 overlap if an axis is invalid
-			if(float.IsNaN(left.axis.X) || float.IsNaN(left.axis.Y) || float.IsNaN(right.axis.X) || float.IsNaN(right.axis.Y))
+			if(left.IsInvalid() || right.IsInvalid())
 				return new Vector2f();
 			
 			if(left.axis != right.axis)
